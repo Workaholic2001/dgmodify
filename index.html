@@ -1,0 +1,3745 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DGMODIFY | Dammika Gunarathna — Visual Creative</title>
+  <link rel="icon" type="image/png" href="dg-logo.png">
+  <meta name="description"
+    content="Dammika Gunarathna — Graphic Designer, Photo Editor, Video Editor, Motion Designer & Logo Animator from Sri Lanka." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    /* ── Reset & tokens ──────────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --accent: #29B6F6;
+      --accent2: #0288D1;
+      --bg: #090909;
+      --surface: rgba(10, 10, 10, 0.82);
+      --surface2: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #ffffff;
+      --muted: #888;
+      --font: 'Outfit', sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    button {
+      font-family: var(--font);
+      cursor: pointer;
+      border: none;
+      outline: none;
+    }
+
+    /* ── Canvas — fixed background ───────────────────────────── */
+    #hero-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Dark overlay to keep content readable */
+    #canvas-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(to right,
+          rgba(5, 5, 5, 0.88) 0%,
+          rgba(5, 5, 5, 0.55) 45%,
+          rgba(5, 5, 5, 0.15) 70%,
+          rgba(5, 5, 5, 0.05) 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ── Wrapper — sits above canvas ─────────────────────────── */
+    #site-wrapper {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── Loading screen ──────────────────────────────────────── */
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      transition: opacity 0.6s ease;
+    }
+
+    #loading-screen.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-bar-wrap {
+      width: 200px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .loading-bar {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    .loading-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    @keyframes loader-pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.08);
+        opacity: 0.75;
+      }
+    }
+
+    /* ── Navigation ──────────────────────────────────────────── */
+    #navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 72px;
+      background: rgba(5, 5, 5, 0.75);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s;
+    }
+
+    .nav-logo {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      line-height: 1;
+    }
+
+    .nav-logo>div {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .nav-logo .logo-main {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--text);
+    }
+
+    .nav-logo .logo-sub {
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.25s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--accent);
+      transition: width 0.25s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--text);
+    }
+
+    .nav-links a:hover::after,
+    .nav-links a.active::after {
+      width: 100%;
+    }
+
+    .nav-links a.active {
+      color: var(--accent);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-talk {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: var(--accent);
+      color: #001a2e;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border-radius: 4px;
+      transition: background 0.25s, transform 0.2s;
+    }
+
+    .btn-talk:hover {
+      background: #4FC3F7;
+      transform: translateY(-1px);
+    }
+
+    .btn-talk svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ── Section commons ─────────────────────────────────────── */
+    section {
+      position: relative;
+      width: 100%;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 48px;
+    }
+
+    .section-tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-tag::after {
+      content: '';
+      display: inline-block;
+      width: 32px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .section-heading {
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 800;
+      line-height: 1.08;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      width: 100%;
+    }
+
+    /* ── Hero ────────────────────────────────────────────────── */
+    #home {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 72px;
+    }
+
+    .hero-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      max-width: 560px;
+      padding: 0 48px;
+    }
+
+    .hero-tag {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .hero-name {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 900;
+      line-height: 0.92;
+      letter-spacing: -2px;
+      text-transform: uppercase;
+    }
+
+    .hero-roles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 0;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .hero-roles span {
+      margin-right: 8px;
+    }
+
+    .hero-roles .dot {
+      color: var(--accent);
+      margin-right: 8px;
+    }
+
+    .hero-desc {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.6);
+      max-width: 420px;
+    }
+
+    .hero-cta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 28px;
+      background: var(--accent);
+      color: #001a2e;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border-radius: 4px;
+      transition: all 0.25s;
+    }
+
+    .btn-primary:hover {
+      background: #4FC3F7;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border-radius: 4px;
+      transition: all 0.25s;
+      background: transparent;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── Social Links — creative pill style ──────────────────── */
+    .hero-socials {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-top: 8px;
+    }
+
+    .social-link {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(8px);
+      overflow: hidden;
+      transition: color 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .social-link svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Glow layer */
+    .social-link::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    /* Per-platform brand colours */
+    .social-link--fb::before {
+      background: rgba(24, 119, 242, 0.12);
+    }
+
+    .social-link--ig::before {
+      background: linear-gradient(135deg, rgba(193, 53, 132, 0.12), rgba(253, 165, 10, 0.08));
+    }
+
+    .social-link--yt::before {
+      background: rgba(255, 0, 0, 0.10);
+    }
+
+    .social-link--tt::before {
+      background: rgba(0, 242, 234, 0.08);
+    }
+
+    .social-link--fb:hover {
+      color: #fff;
+      border-color: #1877F2;
+      box-shadow: 0 0 18px rgba(24, 119, 242, 0.35);
+    }
+
+    .social-link--ig:hover {
+      color: #fff;
+      border-color: #C13584;
+      box-shadow: 0 0 18px rgba(193, 53, 132, 0.35);
+    }
+
+    .social-link--yt:hover {
+      color: #fff;
+      border-color: #FF0000;
+      box-shadow: 0 0 18px rgba(255, 0, 0, 0.35);
+    }
+
+    .social-link--tt:hover {
+      color: #fff;
+      border-color: #00F2EA;
+      box-shadow: 0 0 18px rgba(0, 242, 234, 0.30);
+    }
+
+    .social-link:hover::before {
+      opacity: 1;
+    }
+
+    .social-link:hover svg {
+      transform: scale(1.2) rotate(-6deg);
+    }
+
+    /* ── Scroll Indicator ────────────────────────────────── */
+    .scroll-indicator {
+      position: absolute;
+      left: 24px;
+      bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .scroll-indicator .si-label {
+      writing-mode: vertical-lr;
+      text-orientation: mixed;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .scroll-indicator .si-track {
+      width: 1px;
+      height: 52px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scroll-indicator .si-track::after {
+      content: '';
+      position: absolute;
+      top: -100%;
+      left: 0;
+      width: 100%;
+      height: 40%;
+      background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+      animation: siDrop 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes siDrop {
+      0% {
+        top: -40%;
+      }
+
+      100% {
+        top: 140%;
+      }
+    }
+
+    .scroll-indicator .si-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent);
+      animation: siPulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes siPulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(0.6);
+      }
+    }
+
+    /* ── Services ────────────────────────────────────────────── */
+    #services {
+      background: rgba(5, 5, 5, 0.92);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 100px 0;
+    }
+
+    .services-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .services-heading {
+      font-size: clamp(28px, 3.5vw, 44px);
+    }
+
+    .services-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-top: 28px;
+      transition: gap 0.25s;
+    }
+
+    .services-link:hover {
+      gap: 14px;
+    }
+
+    .services-link svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .service-card {
+      background: var(--bg);
+      padding: 36px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: background 0.25s;
+      cursor: default;
+    }
+
+    .service-card:hover {
+      background: rgba(79, 195, 247, 0.04);
+    }
+
+    .service-icon {
+      width: 48px;
+      height: 48px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 6px;
+      transition: border-color 0.25s;
+    }
+
+    .service-card:hover .service-icon {
+      border-color: var(--accent);
+    }
+
+    .service-icon svg {
+      width: 22px;
+      height: 22px;
+      color: var(--accent);
+    }
+
+    .service-name {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .service-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ── Work / Portfolio ────────────────────────────────────── */
+    #work {
+      background: rgba(5, 5, 5, 0.92);
+      padding: 100px 0;
+    }
+
+    .work-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 48px;
+    }
+
+    .filter-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .filter-tab {
+      padding: 8px 18px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-radius: 4px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-tab.active,
+    .filter-tab:hover {
+      background: var(--accent);
+      color: #001a2e;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+
+    .project-card {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      aspect-ratio: 3/4;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .project-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .project-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Gradient-based project thumbnails (no external images) */
+    .proj-1 {
+      background: linear-gradient(145deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+    }
+
+    .proj-2 {
+      background: linear-gradient(145deg, #2d1b69 0%, #11174a 50%, #1a0533 100%);
+    }
+
+    .proj-3 {
+      background: linear-gradient(145deg, #0a2a0a 0%, #0d3b0d 50%, #143314 100%);
+    }
+
+    .proj-4 {
+      background: linear-gradient(145deg, #1a0000 0%, #3d0000 50%, #1a0a2e 100%);
+    }
+
+    .proj-5 {
+      background: linear-gradient(145deg, #111 0%, #222 50%, #111 100%);
+    }
+
+    .project-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 60%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 20px 16px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .project-card:hover .project-overlay {
+      opacity: 1;
+    }
+
+    .project-type {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .project-title {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .project-arrow {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .project-card:hover .project-arrow {
+      opacity: 1;
+    }
+
+    .project-arrow svg {
+      width: 14px;
+      height: 14px;
+      color: #000;
+    }
+
+    /* Project graphic elements inside cards */
+    .proj-content {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .proj-content::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: inherit;
+    }
+
+    .proj-label {
+      position: absolute;
+      font-size: 22px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+      line-height: 1.1;
+      padding: 0 16px;
+      color: rgba(255, 255, 255, 0.15);
+    }
+
+    .proj-label.accent {
+      color: rgba(79, 195, 247, 0.3);
+    }
+
+    /* View all link */
+    .view-all-wrap {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 40px;
+    }
+
+    .view-all-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      border-bottom: 1px solid transparent;
+      padding-bottom: 2px;
+      transition: gap 0.25s, border-color 0.25s;
+    }
+
+    .view-all-link:hover {
+      gap: 14px;
+      border-color: var(--accent);
+    }
+
+    .view-all-link svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ── Photo Editing ───────────────────────────────────────── */
+    #photo-editing {
+      background: rgba(6, 6, 6, 0.94);
+      border-top: 1px solid var(--border);
+      padding: 100px 0;
+    }
+
+    .photo-layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+
+    .before-after {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      aspect-ratio: 4/3;
+      background: #111;
+    }
+
+    .ba-before,
+    .ba-after {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ba-before {
+      background: linear-gradient(135deg, #0a1628 0%, #1a3550 100%);
+    }
+
+    .ba-after {
+      background: linear-gradient(135deg, #0d2b0d 0%, #1a5a1a 100%);
+      clip-path: inset(0 50% 0 0);
+      transition: clip-path 0.01s;
+    }
+
+    .ba-label {
+      position: absolute;
+      bottom: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .ba-before .ba-label {
+      left: 12px;
+    }
+
+    .ba-after .ba-label {
+      right: 12px;
+    }
+
+    .ba-divider {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: var(--accent);
+      cursor: ew-resize;
+      transform: translateX(-50%);
+    }
+
+    .ba-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ba-handle svg {
+      width: 18px;
+      height: 18px;
+      color: #000;
+    }
+
+    .ba-mountains-before {
+      width: 80%;
+      height: 60%;
+      background: linear-gradient(to bottom, #1a2a4a, #2a4a6a);
+      clip-path: polygon(0% 60%, 20% 30%, 35% 50%, 50% 20%, 65% 45%, 80% 25%, 100% 55%, 100% 100%, 0% 100%);
+    }
+
+    .ba-mountains-after {
+      width: 80%;
+      height: 60%;
+      background: linear-gradient(to bottom, #0a2e1a, #1a5a2a);
+      clip-path: polygon(0% 60%, 20% 30%, 35% 50%, 50% 20%, 65% 45%, 80% 25%, 100% 55%, 100% 100%, 0% 100%);
+    }
+
+    .ba-sky-before {
+      background: linear-gradient(to bottom, #0a1628, #2a3a5a);
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+    }
+
+    .ba-sky-after {
+      background: linear-gradient(to bottom, #0a2820, #1a4a30);
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+    }
+
+    .photo-right {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .photo-thumb {
+      aspect-ratio: 4/3;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.15);
+      cursor: pointer;
+      transition: transform 0.25s, border-color 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .photo-thumb:hover {
+      transform: scale(1.02);
+      border-color: var(--accent);
+    }
+
+    .pt-1 {
+      background: linear-gradient(135deg, #1a1a3e, #2a2a6e);
+    }
+
+    .pt-2 {
+      background: linear-gradient(135deg, #1a3a1a, #2a6a2a);
+    }
+
+    .pt-3 {
+      background: linear-gradient(135deg, #3a1a1a, #6a2a2a);
+    }
+
+    .pt-4 {
+      background: linear-gradient(135deg, #2a1a3a, #4a2a6a);
+    }
+
+    .photo-thumb-label {
+      position: absolute;
+      font-size: 22px;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.12);
+      text-transform: uppercase;
+    }
+
+    /* ── Graphic Design ──────────────────────────────────────── */
+    #graphic-design {
+      background: rgba(5, 5, 5, 0.92);
+      border-top: 1px solid var(--border);
+      padding: 100px 0;
+    }
+
+    .graphic-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 64px;
+      align-items: start;
+    }
+
+    .graphic-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .gcard {
+      aspect-ratio: 3/4;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 12px 8px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      transition: transform 0.25s, border-color 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gcard:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
+
+    .gc-1 {
+      background: linear-gradient(145deg, #0a0a1e, #1a1a4a);
+    }
+
+    .gc-2 {
+      background: linear-gradient(145deg, #1a0a0a, #4a1a1a);
+    }
+
+    .gc-3 {
+      background: linear-gradient(145deg, #0a1a0a, #1a4a1a);
+    }
+
+    .gc-4 {
+      background: linear-gradient(145deg, #1a1a0a, #4a4a1a);
+    }
+
+    .gc-5 {
+      background: linear-gradient(145deg, #1a0a1a, #4a1a4a);
+    }
+
+    .gcard-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -60%);
+      font-size: 28px;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.08);
+      text-transform: uppercase;
+      letter-spacing: -1px;
+    }
+
+    /* ── Video & Motion ──────────────────────────────────────── */
+    #video-motion {
+      background: rgba(6, 6, 6, 0.94);
+      border-top: 1px solid var(--border);
+      padding: 100px 0;
+    }
+
+    .video-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 40px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .yt-channel-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 0, 0, 0.08);
+      border: 1px solid rgba(255, 0, 0, 0.22);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: #ff8585;
+      margin-top: 10px;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .yt-channel-badge:hover {
+      background: rgba(255, 0, 0, 0.15);
+      border-color: rgba(255, 0, 0, 0.4);
+    }
+
+    .yt-live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ff2222;
+      box-shadow: 0 0 8px #ff2222;
+      animation: yt-pulse-dot 1.5s infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes yt-pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.35;
+        transform: scale(0.85);
+      }
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 18px;
+    }
+
+    .video-card {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #0d0d10;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s, box-shadow 0.35s;
+    }
+
+    .video-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(41, 182, 246, 0.45);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.65), 0 0 20px rgba(41, 182, 246, 0.12);
+    }
+
+    .video-card--extra {
+      display: none;
+    }
+
+    .video-grid.show-all .video-card--extra {
+      display: block;
+      animation: videoFadeIn 0.4s ease forwards;
+    }
+
+    @keyframes videoFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .video-thumb {
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background: #141418;
+    }
+
+    .video-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+
+    .video-card:hover .video-thumb-img {
+      transform: scale(1.08);
+    }
+
+    .video-thumb-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.2) 60%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .play-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(10, 10, 12, 0.72);
+      backdrop-filter: blur(8px);
+      border: 1.5px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      z-index: 2;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.25s, box-shadow 0.3s;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    }
+
+    .video-card:hover .play-btn {
+      background: var(--accent);
+      transform: scale(1.14);
+      box-shadow: 0 0 22px rgba(41, 182, 246, 0.65);
+    }
+
+    .video-card:hover .play-btn svg {
+      color: #000;
+      fill: #000;
+    }
+
+    .play-btn svg {
+      width: 15px;
+      height: 15px;
+      color: var(--accent);
+      fill: var(--accent);
+      margin-left: 3px;
+      transition: color 0.25s, fill 0.25s;
+    }
+
+    .video-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(4px);
+      padding: 3px 7px;
+      border-radius: 4px;
+      z-index: 2;
+      text-transform: uppercase;
+    }
+
+    .yt-thumb-logo {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      z-index: 2;
+      width: 18px;
+      height: 14px;
+      color: #ff0000;
+      opacity: 0.8;
+      transition: opacity 0.25s;
+    }
+
+    .video-card:hover .yt-thumb-logo {
+      opacity: 1;
+    }
+
+    .yt-thumb-logo svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .video-info {
+      padding: 13px 14px;
+      background: rgba(255, 255, 255, 0.025);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .video-type {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .video-title {
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.35;
+      color: #f0f0f0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 32px;
+    }
+
+    .video-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .video-watch-link {
+      color: var(--accent);
+      font-weight: 600;
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .video-card:hover .video-watch-link {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ── YouTube Player Modal ────────────────────────────────── */
+    .yt-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .yt-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .yt-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(10px);
+    }
+
+    .yt-modal-content {
+      position: relative;
+      z-index: 2;
+      background: #0f0f11;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 860px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(41, 182, 246, 0.15);
+      overflow: hidden;
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .yt-modal.active .yt-modal-content {
+      transform: scale(1);
+    }
+
+    .yt-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+      gap: 16px;
+    }
+
+    .yt-modal-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .yt-modal-close {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .yt-modal-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .yt-modal-iframe-wrap {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      background: #000;
+    }
+
+    .yt-modal-iframe-wrap iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .yt-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Tools ───────────────────────────────────────────────── */
+    #tools {
+      background: rgba(5, 5, 5, 0.94);
+      border-top: 1px solid var(--border);
+      padding: 80px 0;
+    }
+
+    .tools-layout {
+      display: flex;
+      align-items: center;
+      gap: 64px;
+    }
+
+    .tools-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tools-label::after {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .tools-track {
+      display: flex;
+      align-items: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+
+    .tool-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: opacity 0.25s;
+      opacity: 0.65;
+    }
+
+    .tool-item:hover {
+      opacity: 1;
+    }
+
+    .tool-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .tool-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+      display: block;
+    }
+
+    .tool-icon svg {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+    }
+
+    /* Remove old coloured bg — images carry their own */
+    .ti-ps,
+    .ti-ai,
+    .ti-pr,
+    .ti-ae,
+    .ti-dv {
+      background: transparent;
+      color: #000;
+    }
+
+    .tool-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .tools-more {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ── About + CTA ─────────────────────────────────────────── */
+    #about {
+      background: rgba(5, 5, 5, 0.92);
+      border-top: 1px solid var(--border);
+      padding: 100px 0;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 220px 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .about-photo-wrap {
+      position: relative;
+    }
+
+    .about-photo {
+      width: 100%;
+      aspect-ratio: 3/4;
+      border-radius: 12px;
+      background: linear-gradient(145deg, #111, #222);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .about-photo:hover {
+      border-color: rgba(41, 182, 246, 0.4);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(41, 182, 246, 0.15);
+    }
+
+    .about-photo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 18%;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+
+    .about-photo:hover .about-photo-img {
+      transform: scale(1.04);
+    }
+
+    .about-photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(9, 9, 9, 0.35) 0%, transparent 40%);
+      pointer-events: none;
+    }
+
+    .about-photo-silhouette {
+      width: 75%;
+      height: 90%;
+      background: linear-gradient(to top, #333, #1a1a1a);
+      clip-path: polygon(30% 100%, 30% 55%, 15% 40%, 20% 25%, 35% 15%, 50% 12%, 65% 15%, 80% 25%, 85% 40%, 70% 55%, 70% 100%);
+    }
+
+    .about-text-col {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .about-bio {
+      font-size: 14px;
+      line-height: 1.75;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .about-bio strong {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .about-motto {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+    }
+
+    .about-motto strong {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .about-sig {
+      font-size: 24px;
+      font-style: italic;
+      color: var(--accent);
+      font-weight: 300;
+      margin-top: 8px;
+    }
+
+    .cta-col {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      padding: 40px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(79, 195, 247, 0.03);
+    }
+
+    .cta-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cta-eyebrow::after {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .cta-heading {
+      font-size: clamp(28px, 3vw, 42px);
+      font-weight: 900;
+      line-height: 1.05;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+    }
+
+    .cta-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .contact-details {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .contact-item svg {
+      width: 15px;
+      height: 15px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── Footer ──────────────────────────────────────────────── */
+    #footer {
+      background: rgba(3, 3, 3, 0.97);
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .footer-socials {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .back-to-top {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.25s;
+      background: transparent;
+    }
+
+    .back-to-top:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .back-to-top svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ── Photoshop Text-Tool Hero Animation ───────────── */
+    .ps-text-wrap {
+      position: relative;
+      display: inline-block;
+    }
+
+    /* The dashed selection rectangle */
+    .ps-box {
+      position: absolute;
+      inset: -14px -18px;
+      border: 1.5px dashed rgba(41, 182, 246, 0.0);
+      border-radius: 2px;
+      pointer-events: none;
+      transform: scaleX(0.05) scaleY(0.15);
+      transform-origin: left center;
+      transition:
+        transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.2s ease;
+      opacity: 0;
+    }
+
+    .ps-box.ps-box--drawing {
+      opacity: 1;
+      border-color: rgba(41, 182, 246, 0.75);
+      transform: scaleX(1) scaleY(1);
+    }
+
+    .ps-box.ps-box--done {
+      border-color: rgba(41, 182, 246, 0.35);
+    }
+
+    /* Corner + midpoint handles */
+    .ps-corner {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #29B6F6;
+      border: 1px solid #001a2e;
+      opacity: 0;
+      transition: opacity 0.2s 0.45s;
+    }
+
+    .ps-box.ps-box--drawing .ps-corner {
+      opacity: 1;
+    }
+
+    /* positions */
+    .ps-tl {
+      top: -3px;
+      left: -3px;
+    }
+
+    .ps-tr {
+      top: -3px;
+      right: -3px;
+    }
+
+    .ps-bl {
+      bottom: -3px;
+      left: -3px;
+    }
+
+    .ps-br {
+      bottom: -3px;
+      right: -3px;
+    }
+
+    .ps-tm {
+      top: -3px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .ps-bm {
+      bottom: -3px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .ps-ml {
+      left: -3px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .ps-mr {
+      right: -3px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    /* Tool label bubble */
+    .ps-tool-label {
+      position: absolute;
+      top: -28px;
+      left: -1px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #29B6F6;
+      background: rgba(0, 20, 40, 0.85);
+      border: 1px solid rgba(41, 182, 246, 0.3);
+      padding: 3px 8px;
+      border-radius: 3px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s 0.5s;
+    }
+
+    .ps-box.ps-box--drawing .ps-tool-label {
+      opacity: 1;
+    }
+
+    .ps-box.ps-box--done .ps-tool-label {
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    /* Typed text stays invisible until box is drawn */
+    #ps-typed {
+      display: inline;
+      white-space: pre-wrap;
+    }
+
+    /* Blinking cursor */
+    .ps-cursor {
+      display: inline-block;
+      color: #29B6F6;
+      font-weight: 300;
+      animation: ps-blink 0.9s step-end infinite;
+      opacity: 0;
+    }
+
+    .ps-cursor.ps-cursor--active {
+      opacity: 1;
+    }
+
+    @keyframes ps-blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+    }
+
+    /* ── Advanced Scroll-Reveal Animations ─────────────────── */
+
+    /* Base hidden state */
+    [data-anim] {
+      will-change: transform, opacity;
+    }
+
+    /* fade-up */
+    [data-anim="fade-up"] {
+      opacity: 0;
+      transform: translateY(48px);
+      transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* fade-down */
+    [data-anim="fade-down"] {
+      opacity: 0;
+      transform: translateY(-40px);
+      transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* fade-left (slides in from right) */
+    [data-anim="fade-left"] {
+      opacity: 0;
+      transform: translateX(60px);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* fade-right (slides in from left) */
+    [data-anim="fade-right"] {
+      opacity: 0;
+      transform: translateX(-60px);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* scale-up */
+    [data-anim="scale-up"] {
+      opacity: 0;
+      transform: scale(0.88);
+      transition: opacity 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* fade-blur */
+    [data-anim="fade-blur"] {
+      opacity: 0;
+      filter: blur(10px);
+      transform: translateY(24px);
+      transition: opacity 0.85s ease,
+        filter 0.85s ease,
+        transform 0.85s ease;
+    }
+
+    /* reveal (clip-path wipe up) */
+    [data-anim="reveal"] {
+      opacity: 0;
+      clip-path: inset(0 0 100% 0);
+      transition: opacity 0.01s,
+        clip-path 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* visible — all variants reset to natural state */
+    [data-anim].anim-visible {
+      opacity: 1;
+      transform: none;
+      filter: none;
+      clip-path: inset(0 0 0% 0);
+    }
+
+    /* Stagger delays for child items */
+    [data-anim-stagger]>* {
+      opacity: 0;
+      transform: translateY(36px);
+      transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    [data-anim-stagger].anim-visible>* {
+      opacity: 1;
+      transform: none;
+    }
+
+    [data-anim-stagger].anim-visible>*:nth-child(1) {
+      transition-delay: 0.05s;
+    }
+
+    [data-anim-stagger].anim-visible>*:nth-child(2) {
+      transition-delay: 0.12s;
+    }
+
+    [data-anim-stagger].anim-visible>*:nth-child(3) {
+      transition-delay: 0.19s;
+    }
+
+    [data-anim-stagger].anim-visible>*:nth-child(4) {
+      transition-delay: 0.26s;
+    }
+
+    [data-anim-stagger].anim-visible>*:nth-child(5) {
+      transition-delay: 0.33s;
+    }
+
+    [data-anim-stagger].anim-visible>*:nth-child(6) {
+      transition-delay: 0.40s;
+    }
+
+    [data-anim-stagger].anim-visible>*:nth-child(7) {
+      transition-delay: 0.47s;
+    }
+
+    [data-anim-stagger].anim-visible>*:nth-child(8) {
+      transition-delay: 0.54s;
+    }
+
+    [data-anim-stagger].anim-visible>*:nth-child(n+9) {
+      transition-delay: 0.60s;
+    }
+
+    /* Legacy .fade-up support */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Responsive (basic) ──────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .services-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .projects-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .graphic-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .graphic-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .video-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .photo-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 0 20px;
+      }
+
+      #navbar {
+        padding: 0 20px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero-inner {
+        padding: 0 20px;
+      }
+
+      .projects-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .video-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .tools-track {
+        gap: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── Loading Screen ────────────────────────────────────────── -->
+  <div id="loading-screen">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:18px;margin-bottom:20px">
+      <img src="dg-logo.png" alt="DGMODIFY Logo"
+        style="width:90px;height:90px;object-fit:contain;animation:loader-pulse 1.6s ease-in-out infinite;filter:drop-shadow(0 0 18px rgba(41,182,246,0.55));">
+      <div class="nav-logo" style="text-align:center">
+        <span class="logo-main">DGMODIFY</span>
+        <span class="logo-sub" style="display:block">Visual Creative</span>
+      </div>
+    </div>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar" id="loading-bar"></div>
+    </div>
+    <div class="loading-label">Loading frames…</div>
+  </div>
+
+  <!-- ── Fixed canvas background ───────────────────────────────── -->
+  <canvas id="hero-canvas"></canvas>
+  <div id="canvas-overlay"></div>
+
+  <!-- ── Site Content ──────────────────────────────────────────── -->
+  <div id="site-wrapper">
+
+    <!-- Navigation -->
+    <nav id="navbar">
+      <a href="#home" class="nav-logo" style="display:flex;flex-direction:row;align-items:center;gap:10px;">
+        <!-- DG Logo Image -->
+        <img src="dg-logo.png" alt="DG Logo" style="width:48px;height:48px;flex-shrink:0;object-fit:contain;">
+        <div>
+          <span class="logo-main">DGMODIFY</span>
+          <span class="logo-sub" style="display:block">Visual Creative</span>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#home" class="active" id="nav-home">Home</a></li>
+        <li><a href="#about" id="nav-about">About</a></li>
+        <li><a href="#work" id="nav-work">Work</a></li>
+        <li><a href="#services" id="nav-services">Services</a></li>
+        <li><a href="#tools" id="nav-tools">Tools</a></li>
+        <li><a href="#about" id="nav-contact">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="#about" class="btn-talk" id="btn-lets-talk">
+          LET'S TALK
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </a>
+      </div>
+    </nav>
+
+    <!-- ── HERO ──────────────────────────────────────────────── -->
+    <section id="home">
+      <div class="hero-inner">
+        <p class="hero-tag">Hey, I'm</p>
+        <!-- Photoshop text-tool animated name -->
+        <div class="ps-text-wrap" id="ps-text-wrap">
+          <!-- Selection box -->
+          <div class="ps-box" id="ps-box">
+            <span class="ps-corner ps-tl"></span>
+            <span class="ps-corner ps-tr"></span>
+            <span class="ps-corner ps-bl"></span>
+            <span class="ps-corner ps-br"></span>
+            <span class="ps-corner ps-tm"></span>
+            <span class="ps-corner ps-bm"></span>
+            <span class="ps-corner ps-ml"></span>
+            <span class="ps-corner ps-mr"></span>
+            <!-- Toolbar label -->
+            <span class="ps-tool-label">T &nbsp; Type Tool</span>
+          </div>
+          <!-- The actual name -->
+          <h1 class="hero-name" id="hero-name-el"><span id="ps-typed"></span><span class="ps-cursor"
+              id="ps-cursor">|</span></h1>
+        </div>
+        <div class="hero-roles">
+          <span>Graphic Designer</span><span class="dot">•</span>
+          <span>Photo Editor</span><span class="dot">•</span>
+          <span>Video Editor</span>
+          <span style="width:100%;display:block;height:2px"></span>
+          <span>Motion Designer</span>
+        </div>
+        <p class="hero-desc">
+          I turn ideas into powerful visual stories.<br>
+          Designing visuals that connect, inspire and make an impact.
+        </p>
+        <div class="hero-cta">
+          <a href="#work" class="btn-primary" id="btn-view-work">
+            View My Work
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </a>
+          <a href="#" class="btn-outline" id="btn-download-cv">
+            Download CV
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7,10 12,15 17,10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </a>
+        </div>
+        <div class="hero-socials">
+          <!-- Facebook -->
+          <a href="https://www.facebook.com/dgmodify/" target="_blank" rel="noopener"
+            class="social-link social-link--fb" aria-label="Facebook" id="social-facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+            </svg>
+          </a>
+          <!-- Instagram -->
+          <a href="https://www.instagram.com/dammika_gunarathna/" target="_blank" rel="noopener"
+            class="social-link social-link--ig" aria-label="Instagram" id="social-instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+            </svg>
+          </a>
+          <!-- YouTube -->
+          <a href="https://www.youtube.com/@dgmodify" target="_blank" rel="noopener" class="social-link social-link--yt"
+            aria-label="YouTube" id="social-youtube">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path
+                d="M22.54 6.42a2.78 2.78 0 0 0-1.94-1.96C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 1.96A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1C5.12 19.56 12 19.56 12 19.56s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-1.95 29 29 0 0 0 .46-5.34 29 29 0 0 0-.46-5.33z" />
+              <polygon points="9.75,15.02 15.5,11.75 9.75,8.48 9.75,15.02" />
+            </svg>
+          </a>
+          <!-- TikTok -->
+          <a href="https://www.tiktok.com/@dgmodify" target="_blank" rel="noopener" class="social-link social-link--tt"
+            aria-label="TikTok" id="social-tiktok">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.73a8.17 8.17 0 0 0 4.78 1.52V6.79a4.85 4.85 0 0 1-1.01-.1z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="scroll-indicator">
+        <span class="si-label">Scroll Down</span>
+        <div class="si-track"></div>
+        <span class="si-dot"></span>
+      </div>
+    </section>
+
+    <!-- ── SERVICES ──────────────────────────────────────────── -->
+    <section id="services">
+      <div class="container">
+        <div class="services-layout fade-up">
+          <div>
+            <p class="section-tag">What I Do</p>
+            <h2 class="section-heading services-heading">Creative<br>Solutions<br>That Connect</h2>
+            <a href="#work" class="services-link" id="explore-services-link">
+              Explore Services
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+          <div class="services-grid">
+            <!-- Card 1 -->
+            <div class="service-card">
+              <div class="service-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21,15 16,10 5,21" />
+                </svg>
+              </div>
+              <div class="service-name">Photo Editing</div>
+              <div class="service-desc">Retouching, color grading, manipulation &amp; more.</div>
+            </div>
+            <!-- Card 2 -->
+            <div class="service-card">
+              <div class="service-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                  <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                  <path d="M2 2l7.586 7.586" />
+                  <circle cx="11" cy="11" r="2" />
+                </svg>
+              </div>
+              <div class="service-name">Graphic Design</div>
+              <div class="service-desc">Posters, branding, social media, print &amp; more.</div>
+            </div>
+            <!-- Card 3 -->
+            <div class="service-card">
+              <div class="service-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <polygon points="23,7 16,12 23,17 23,7" />
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                </svg>
+              </div>
+              <div class="service-name">Video Editing</div>
+              <div class="service-desc">Professional editing, transitions &amp; storytelling.</div>
+            </div>
+            <!-- Card 4 -->
+            <div class="service-card">
+              <div class="service-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <polygon points="5,3 19,12 5,21 5,3" />
+                </svg>
+              </div>
+              <div class="service-name">Motion Graphics</div>
+              <div class="service-desc">Titles, animations, promo videos &amp; visual effects.</div>
+            </div>
+            <!-- Card 5 -->
+            <div class="service-card">
+              <div class="service-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                  <path d="M2 17l10 5 10-5" />
+                  <path d="M2 12l10 5 10-5" />
+                </svg>
+              </div>
+              <div class="service-name">Logo Animation</div>
+              <div class="service-desc">Animated logos, intros &amp; brand animations.</div>
+            </div>
+            <!-- Card 6 -->
+            <div class="service-card">
+              <div class="service-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" />
+                  <line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+              </div>
+              <div class="service-name">Social Media Design</div>
+              <div class="service-desc">Creative posts, ads, banners &amp; stories.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FEATURED PROJECTS ─────────────────────────────────── -->
+    <section id="work">
+      <div class="container">
+        <div class="work-header fade-up">
+          <div>
+            <p class="section-tag">Selected Work</p>
+            <h2 class="section-heading">Featured<br>Projects</h2>
+          </div>
+          <div class="filter-tabs">
+            <button class="filter-tab active" id="tab-all" onclick="filterProjects('all')">All</button>
+            <button class="filter-tab" id="tab-photo" onclick="filterProjects('photo')">Photo</button>
+            <button class="filter-tab" id="tab-graphic" onclick="filterProjects('graphic')">Graphic</button>
+            <button class="filter-tab" id="tab-video" onclick="filterProjects('video')">Video</button>
+            <button class="filter-tab" id="tab-motion" onclick="filterProjects('motion')">Motion</button>
+          </div>
+        </div>
+
+        <div class="projects-grid fade-up" id="projects-grid">
+          <!-- Project 1 -->
+          <div class="project-card" data-type="photo" id="proj-1">
+            <div class="proj-content proj-1">
+              <span class="proj-label">CINEMATIC<br>PORTRAIT</span>
+            </div>
+            <div class="project-overlay">
+              <div class="project-type">Photo Editing</div>
+              <div class="project-title">Cinematic Portrait</div>
+            </div>
+            <div class="project-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+          <!-- Project 2 -->
+          <div class="project-card" data-type="graphic" id="proj-2">
+            <div class="proj-content proj-2">
+              <span class="proj-label">MOVIE<br>POSTER</span>
+            </div>
+            <div class="project-overlay">
+              <div class="project-type">Graphic Design</div>
+              <div class="project-title">Movie Poster Design</div>
+            </div>
+            <div class="project-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+          <!-- Project 3 -->
+          <div class="project-card" data-type="video" id="proj-3">
+            <div class="proj-content proj-3">
+              <span class="proj-label">TRAVEL<br>CINEMATIC</span>
+            </div>
+            <div class="project-overlay">
+              <div class="project-type">Video Editing</div>
+              <div class="project-title">Travel Cinematic</div>
+            </div>
+            <div class="project-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+          <!-- Project 4 -->
+          <div class="project-card" data-type="motion" id="proj-4">
+            <div class="proj-content proj-4">
+              <span class="proj-label accent">NEVER<br>STOP<br>CREATING</span>
+            </div>
+            <div class="project-overlay">
+              <div class="project-type">Motion Design</div>
+              <div class="project-title">Neon Title Animation</div>
+            </div>
+            <div class="project-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+          <!-- Project 5 -->
+          <div class="project-card" data-type="motion" id="proj-5">
+            <div class="proj-content proj-5">
+              <span class="proj-label">DG<br>MODIFY</span>
+            </div>
+            <div class="project-overlay">
+              <div class="project-type">Logo Animation</div>
+              <div class="project-title">DGMODIFY Intro</div>
+            </div>
+            <div class="project-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="view-all-wrap fade-up">
+          <a href="#" class="view-all-link" id="view-all-work">
+            View All Work
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PHOTO EDITING ─────────────────────────────────────── -->
+    <section id="photo-editing">
+      <div class="container">
+        <p class="section-tag fade-up">Photo Editing</p>
+        <div class="photo-layout">
+          <!-- Before/After -->
+          <div class="fade-up">
+            <div class="before-after" id="before-after-wrap">
+              <div class="ba-before">
+                <div class="ba-sky-before"></div>
+                <div class="ba-mountains-before"></div>
+                <span class="ba-label">Before</span>
+              </div>
+              <div class="ba-after" id="ba-after">
+                <div class="ba-sky-after"></div>
+                <div class="ba-mountains-after"></div>
+                <span class="ba-label">After</span>
+              </div>
+              <div class="ba-divider" id="ba-divider">
+                <div class="ba-handle">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M8 18l-6-6 6-6M16 6l6 6-6 6" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="view-all-wrap" style="margin-top:24px">
+              <a href="#" class="view-all-link" id="view-photo-edits">
+                View More Photo Edits
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
+          </div>
+          <!-- Photo thumbnails -->
+          <div class="photo-right fade-up">
+            <div class="photo-thumb pt-1" id="photo-thumb-1">
+              <span class="photo-thumb-label">PORTRAIT</span>
+            </div>
+            <div class="photo-thumb pt-2" id="photo-thumb-2">
+              <span class="photo-thumb-label">LANDSCAPE</span>
+            </div>
+            <div class="photo-thumb pt-3" id="photo-thumb-3">
+              <span class="photo-thumb-label">PRODUCT</span>
+            </div>
+            <div class="photo-thumb pt-4" id="photo-thumb-4">
+              <span class="photo-thumb-label">COMPOSITE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── GRAPHIC DESIGN ────────────────────────────────────── -->
+    <section id="graphic-design">
+      <div class="container">
+        <div class="graphic-layout">
+          <div>
+            <p class="section-tag fade-up">Graphic Design</p>
+            <div class="graphic-grid fade-up">
+              <div class="gcard gc-1" id="gc-poster">
+                <div class="gcard-icon">PST</div>
+                <span>Poster Design</span>
+              </div>
+              <div class="gcard gc-2" id="gc-social">
+                <div class="gcard-icon">SM</div>
+                <span>Social Media</span>
+              </div>
+              <div class="gcard gc-3" id="gc-brand">
+                <div class="gcard-icon">BRD</div>
+                <span>Branding</span>
+              </div>
+              <div class="gcard gc-4" id="gc-biz">
+                <div class="gcard-icon">BC</div>
+                <span>Business Card</span>
+              </div>
+              <div class="gcard gc-5" id="gc-invite">
+                <div class="gcard-icon">INV</div>
+                <span>Invitation</span>
+              </div>
+            </div>
+            <div class="view-all-wrap fade-up" style="margin-top:32px">
+              <a href="#" class="view-all-link" id="view-graphic-work">
+                View More Graphic Work
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
+          </div>
+          <!-- Right side info -->
+          <div class="fade-up" style="padding-top: 48px;">
+            <h2 class="section-heading" style="font-size: clamp(28px,3vw,44px)">Bringing<br>Ideas To<br>Life</h2>
+            <p style="font-size:14px;color:var(--muted);line-height:1.7;margin-top:20px;max-width:320px">
+              Every design is crafted with precision and purpose — from concept to final output, ensuring every pixel
+              speaks the brand's language.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── VIDEO & MOTION ────────────────────────────────────── -->
+    <section id="video-motion">
+      <div class="container">
+        <div class="video-header fade-up">
+          <div>
+            <p class="section-tag">Video &amp; Motion</p>
+            <h2 class="section-heading">Bringing Ideas<br>To Motion</h2>
+            <a href="https://www.youtube.com/@dgmodify" target="_blank" rel="noopener" class="yt-channel-badge"
+              id="yt-live-status">
+              <span class="yt-live-dot"></span>
+              <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="color:#ff3333;flex-shrink:0">
+                <path
+                  d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
+              <span>Live YouTube Feed: <strong>@dgmodify</strong></span>
+            </a>
+          </div>
+          <div style="display:flex;align-items:flex-end;padding-bottom:8px">
+            <a href="https://www.youtube.com/@dgmodify" target="_blank" rel="noopener" class="view-all-link"
+              id="view-all-videos">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"
+                style="color:#ff0000;margin-right:2px">
+                <path
+                  d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
+              Visit Channel
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="video-grid fade-up" id="video-grid">
+          <!-- Video 1 -->
+          <div class="video-card" data-video-id="A761BCYht5g"
+            onclick="openYtModal('A761BCYht5g', '“She Crossed the Screen… And Shook My Hand 😍”', 'https://www.youtube.com/shorts/A761BCYht5g')">
+            <div class="video-thumb">
+              <img src="https://i.ytimg.com/vi/A761BCYht5g/hqdefault.jpg"
+                alt="She Crossed the Screen… And Shook My Hand" class="video-thumb-img" loading="lazy">
+              <div class="video-thumb-overlay"></div>
+              <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5,3 19,12 5,21 5,3" />
+                </svg></div>
+              <span class="video-badge">SHORTS</span>
+              <div class="yt-thumb-logo"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg></div>
+            </div>
+            <div class="video-info">
+              <div class="video-type">AI VFX &amp; Edit</div>
+              <div class="video-title" title="“She Crossed the Screen… And Shook My Hand 😍”">“She Crossed the Screen…
+                And Shook My Hand 😍”</div>
+              <div class="video-meta">
+                <span>DGMODIFY</span>
+                <span class="video-watch-link">Watch Video →</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video 2 -->
+          <div class="video-card" data-video-id="N0LdAvtjFnM"
+            onclick="openYtModal('N0LdAvtjFnM', 'Assassin\'s Creed Characters taking Selfies on Set! 📸', 'https://www.youtube.com/shorts/N0LdAvtjFnM')">
+            <div class="video-thumb">
+              <img src="https://i.ytimg.com/vi/N0LdAvtjFnM/hqdefault.jpg"
+                alt="Assassin's Creed Characters taking Selfies on Set!" class="video-thumb-img" loading="lazy">
+              <div class="video-thumb-overlay"></div>
+              <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5,3 19,12 5,21 5,3" />
+                </svg></div>
+              <span class="video-badge">SHORTS</span>
+              <div class="yt-thumb-logo"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg></div>
+            </div>
+            <div class="video-info">
+              <div class="video-type">AI Art &amp; Edit</div>
+              <div class="video-title" title="Assassin's Creed Characters taking Selfies on Set! 📸">Assassin's Creed
+                Characters taking Selfies on Set! 📸</div>
+              <div class="video-meta">
+                <span>DGMODIFY</span>
+                <span class="video-watch-link">Watch Video →</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video 3 -->
+          <div class="video-card" data-video-id="e5whnxpLmEs"
+            onclick="openYtModal('e5whnxpLmEs', 'Special Poster Design for Raveen Tharuka', 'https://www.youtube.com/shorts/e5whnxpLmEs')">
+            <div class="video-thumb">
+              <img src="https://i.ytimg.com/vi/e5whnxpLmEs/hqdefault.jpg" alt="Special Poster Design for Raveen Tharuka"
+                class="video-thumb-img" loading="lazy">
+              <div class="video-thumb-overlay"></div>
+              <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5,3 19,12 5,21 5,3" />
+                </svg></div>
+              <span class="video-badge">SHORTS</span>
+              <div class="yt-thumb-logo"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg></div>
+            </div>
+            <div class="video-info">
+              <div class="video-type">Poster Design</div>
+              <div class="video-title" title="Special Poster Design for Raveen Tharuka">Special Poster Design for Raveen
+                Tharuka</div>
+              <div class="video-meta">
+                <span>DGMODIFY</span>
+                <span class="video-watch-link">Watch Video →</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video 4 -->
+          <div class="video-card" data-video-id="gXKxIo_T-Tc"
+            onclick="openYtModal('gXKxIo_T-Tc', 'Sri Lankan Wedding Album Design 😍❤️🇱🇰', 'https://www.youtube.com/shorts/gXKxIo_T-Tc')">
+            <div class="video-thumb">
+              <img src="https://i.ytimg.com/vi/gXKxIo_T-Tc/hqdefault.jpg" alt="Sri Lankan Wedding Album Design"
+                class="video-thumb-img" loading="lazy">
+              <div class="video-thumb-overlay"></div>
+              <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5,3 19,12 5,21 5,3" />
+                </svg></div>
+              <span class="video-badge">PHOTO EDIT</span>
+              <div class="yt-thumb-logo"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg></div>
+            </div>
+            <div class="video-info">
+              <div class="video-type">Album Design</div>
+              <div class="video-title" title="Sri Lankan Wedding Album Design 😍❤️🇱🇰">Sri Lankan Wedding Album Design
+                😍❤️🇱🇰</div>
+              <div class="video-meta">
+                <span>DGMODIFY</span>
+                <span class="video-watch-link">Watch Video →</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video 5 -->
+          <div class="video-card" data-video-id="QgEvXAw5vdk"
+            onclick="openYtModal('QgEvXAw5vdk', 'Mathaka Soya Music Poster Design', 'https://www.youtube.com/shorts/QgEvXAw5vdk')">
+            <div class="video-thumb">
+              <img src="https://i.ytimg.com/vi/QgEvXAw5vdk/hqdefault.jpg" alt="Mathaka Soya Music Poster Design"
+                class="video-thumb-img" loading="lazy">
+              <div class="video-thumb-overlay"></div>
+              <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5,3 19,12 5,21 5,3" />
+                </svg></div>
+              <span class="video-badge">GRAPHIC</span>
+              <div class="yt-thumb-logo"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg></div>
+            </div>
+            <div class="video-info">
+              <div class="video-type">Music Poster</div>
+              <div class="video-title" title="Mathaka Soya Music Poster Design">Mathaka Soya Music Poster Design</div>
+              <div class="video-meta">
+                <span>DGMODIFY</span>
+                <span class="video-watch-link">Watch Video →</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video 6 (Extra) -->
+          <div class="video-card video-card--extra" data-video-id="e3U4p1N8OHM"
+            onclick="openYtModal('e3U4p1N8OHM', 'How to Create Simple Calculator using HTML, CSS, JavaScript', 'https://www.youtube.com/watch?v=e3U4p1N8OHM')">
+            <div class="video-thumb">
+              <img src="https://i.ytimg.com/vi/e3U4p1N8OHM/hqdefault.jpg"
+                alt="How to Create Simple Calculator using HTML, CSS, JavaScript" class="video-thumb-img"
+                loading="lazy">
+              <div class="video-thumb-overlay"></div>
+              <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5,3 19,12 5,21 5,3" />
+                </svg></div>
+              <span class="video-badge">TUTORIAL</span>
+              <div class="yt-thumb-logo"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg></div>
+            </div>
+            <div class="video-info">
+              <div class="video-type">Web Development</div>
+              <div class="video-title" title="How to Create Simple Calculator using HTML, CSS, JavaScript">How to Create
+                Simple Calculator using HTML, CSS, JavaScript</div>
+              <div class="video-meta">
+                <span>DGMODIFY</span>
+                <span class="video-watch-link">Watch Video →</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video 7 (Extra) -->
+          <div class="video-card video-card--extra" data-video-id="ZnrSXMBcp8I"
+            onclick="openYtModal('ZnrSXMBcp8I', 'Oil Painting Effect (Without Plugins) - Chris Hemsworth', 'https://www.youtube.com/watch?v=ZnrSXMBcp8I')">
+            <div class="video-thumb">
+              <img src="https://i.ytimg.com/vi/ZnrSXMBcp8I/hqdefault.jpg"
+                alt="Oil Painting Effect (Without Plugins) - Chris Hemsworth" class="video-thumb-img" loading="lazy">
+              <div class="video-thumb-overlay"></div>
+              <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5,3 19,12 5,21 5,3" />
+                </svg></div>
+              <span class="video-badge">TUTORIAL</span>
+              <div class="yt-thumb-logo"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg></div>
+            </div>
+            <div class="video-info">
+              <div class="video-type">Photoshop Tutorial</div>
+              <div class="video-title" title="Oil Painting Effect (Without Plugins) - Chris Hemsworth">Oil Painting
+                Effect (Without Plugins) - Chris Hemsworth</div>
+              <div class="video-meta">
+                <span>DGMODIFY</span>
+                <span class="video-watch-link">Watch Video →</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video 8 (Extra) -->
+          <div class="video-card video-card--extra" data-video-id="9WpTVLJtN6I"
+            onclick="openYtModal('9WpTVLJtN6I', 'Dramatic Black &amp; White Effect in Photoshop', 'https://www.youtube.com/watch?v=9WpTVLJtN6I')">
+            <div class="video-thumb">
+              <img src="https://i.ytimg.com/vi/9WpTVLJtN6I/hqdefault.jpg"
+                alt="Dramatic Black &amp; White Effect in Photoshop" class="video-thumb-img" loading="lazy">
+              <div class="video-thumb-overlay"></div>
+              <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5,3 19,12 5,21 5,3" />
+                </svg></div>
+              <span class="video-badge">TUTORIAL</span>
+              <div class="yt-thumb-logo"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg></div>
+            </div>
+            <div class="video-info">
+              <div class="video-type">Color Grading</div>
+              <div class="video-title" title="Dramatic Black &amp; White Effect in Photoshop">Dramatic Black &amp; White
+                Effect in Photoshop</div>
+              <div class="video-meta">
+                <span>DGMODIFY</span>
+                <span class="video-watch-link">Watch Video →</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video 9 (Extra) -->
+          <div class="video-card video-card--extra" data-video-id="42UV3srEC2s"
+            onclick="openYtModal('42UV3srEC2s', 'Pixel Sorting Effect in Photoshop', 'https://www.youtube.com/shorts/42UV3srEC2s')">
+            <div class="video-thumb">
+              <img src="https://i.ytimg.com/vi/42UV3srEC2s/hqdefault.jpg" alt="Pixel Sorting Effect in Photoshop"
+                class="video-thumb-img" loading="lazy">
+              <div class="video-thumb-overlay"></div>
+              <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5,3 19,12 5,21 5,3" />
+                </svg></div>
+              <span class="video-badge">SHORTS</span>
+              <div class="yt-thumb-logo"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg></div>
+            </div>
+            <div class="video-info">
+              <div class="video-type">Photoshop VFX</div>
+              <div class="video-title" title="Pixel Sorting Effect in Photoshop">Pixel Sorting Effect in Photoshop</div>
+              <div class="video-meta">
+                <span>DGMODIFY</span>
+                <span class="video-watch-link">Watch Video →</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video 10 (Extra) -->
+          <div class="video-card video-card--extra" data-video-id="bjMs4Ql7M2A"
+            onclick="openYtModal('bjMs4Ql7M2A', 'How to Create a Silhouette Poster in Photoshop (in 2 min)', 'https://www.youtube.com/watch?v=bjMs4Ql7M2A')">
+            <div class="video-thumb">
+              <img src="https://i.ytimg.com/vi/bjMs4Ql7M2A/hqdefault.jpg"
+                alt="How to Create a Silhouette Poster in Photoshop" class="video-thumb-img" loading="lazy">
+              <div class="video-thumb-overlay"></div>
+              <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5,3 19,12 5,21 5,3" />
+                </svg></div>
+              <span class="video-badge">TUTORIAL</span>
+              <div class="yt-thumb-logo"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg></div>
+            </div>
+            <div class="video-info">
+              <div class="video-type">Photoshop Tutorial</div>
+              <div class="video-title" title="How to Create a Silhouette Poster in Photoshop (in 2 min)">How to Create a
+                Silhouette Poster in Photoshop (in 2 min)</div>
+              <div class="video-meta">
+                <span>DGMODIFY</span>
+                <span class="video-watch-link">Watch Video →</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="video-actions-wrap fade-up"
+          style="display:flex;justify-content:center;gap:16px;margin-top:36px;flex-wrap:wrap">
+          <button class="filter-tab" id="btn-toggle-more-videos" onclick="toggleMoreVideos()">
+            <span id="toggle-more-text">Show More Videos (10)</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"
+              style="margin-left:6px;transition:transform 0.3s" id="toggle-more-icon">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+          <a href="https://www.youtube.com/@dgmodify?sub_confirmation=1" target="_blank" rel="noopener"
+            class="btn-primary"
+            style="padding:10px 22px;font-size:13px;display:inline-flex;align-items:center;gap:8px;background:#c00;border-color:#c00;">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+              <path
+                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+            </svg>
+            Subscribe on YouTube
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TOOLS ─────────────────────────────────────────────── -->
+    <section id="tools">
+      <div class="container">
+        <div class="tools-layout fade-up">
+          <div class="tools-label">Tools I Use</div>
+          <div class="tools-track">
+            <!-- Photoshop -->
+            <div class="tool-item" id="tool-ps">
+              <div class="tool-icon ti-ps">
+                <img src="tools_logos/Adobe_Photoshop_CC_icon.svg.png" alt="Adobe Photoshop Logo">
+              </div>
+              <span class="tool-name">Photoshop</span>
+            </div>
+            <!-- Illustrator -->
+            <div class="tool-item" id="tool-ai">
+              <div class="tool-icon ti-ai">
+                <img src="tools_logos/Adobe_Illustrator_CC_icon.svg.png" alt="Adobe Illustrator Logo">
+              </div>
+              <span class="tool-name">Illustrator</span>
+            </div>
+            <!-- Premiere Pro -->
+            <div class="tool-item" id="tool-pr">
+              <div class="tool-icon ti-pr">
+                <img src="tools_logos/Adobe_Premiere_Pro_CC_icon.svg.png" alt="Adobe Premiere Pro Logo">
+              </div>
+              <span class="tool-name">Premiere Pro</span>
+            </div>
+            <!-- After Effects -->
+            <div class="tool-item" id="tool-ae">
+              <div class="tool-icon ti-ae">
+                <img src="tools_logos/Adobe_After_Effects_CC_icon.svg.png" alt="Adobe After Effects Logo">
+              </div>
+              <span class="tool-name">After Effects</span>
+            </div>
+            <!-- DaVinci Resolve -->
+            <div class="tool-item" id="tool-dv">
+              <div class="tool-icon ti-dv">
+                <img src="tools_logos/DaVinci_Resolve_Studio.png" alt="DaVinci Resolve Logo">
+              </div>
+              <span class="tool-name">DaVinci Resolve</span>
+            </div>
+          </div>
+          <div class="tools-more">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+              <circle cx="5" cy="12" r="2" />
+              <circle cx="12" cy="12" r="2" />
+              <circle cx="19" cy="12" r="2" />
+            </svg>
+            And More
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ABOUT + CTA ────────────────────────────────────────── -->
+    <section id="about">
+      <div class="container">
+        <div class="about-grid">
+          <!-- About Photo -->
+          <div class="about-photo-wrap fade-up">
+            <div class="about-photo">
+              <img src="profile.jpg" alt="Dammika Gunarathna" class="about-photo-img" />
+            </div>
+          </div>
+
+          <!-- Bio -->
+          <div class="about-text-col fade-up">
+            <p class="section-tag">About Me</p>
+            <div class="about-bio">
+              <p style="margin-bottom: 16px;">
+                I’m an undergraduate <strong>B.Tech in Web &amp; Creative Media</strong> student at the <strong>University of Vocational Technology (UoVT), Rathmalana</strong>, and a graduate of the <strong>National Diploma in ICT (NVQ Level 5)</strong>.
+              </p>
+              <p style="margin-bottom: 16px;">
+                I’m passionate about <strong>Web Development, Graphic Design, Motion Graphics, Video Editing, Photography, and Digital Media</strong>. I combine technology and creativity to create engaging digital experiences and compelling visual content.
+              </p>
+              <p class="about-motto">
+                <strong>Always learning. Always creating.</strong>
+              </p>
+            </div>
+          </div>
+
+          <!-- CTA -->
+          <div class="cta-col fade-up">
+            <div>
+              <div class="cta-eyebrow">Let's Work Together</div>
+              <h2 class="cta-heading" style="margin-top:12px">Have A Project<br>In Mind?</h2>
+              <p class="cta-sub" style="margin-top:16px">Let's create something amazing together!</p>
+            </div>
+            <div class="contact-details">
+              <div class="contact-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+                dammika.gunarathni@gmail.com
+              </div>
+              <div class="contact-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l1.12-1.12a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
+                +94 77 123 4567
+              </div>
+              <div class="contact-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                Matale, Sri Lanka
+              </div>
+              <div class="contact-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12,6 12,12 16,14" />
+                </svg>
+                Available for freelance work
+              </div>
+            </div>
+            <a href="mailto:dammika.gunarathni@gmail.com" class="btn-primary" id="btn-get-in-touch"
+              style="display:inline-flex;align-self:flex-start">
+              Get In Touch
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FOOTER ─────────────────────────────────────────────── -->
+    <footer id="footer">
+      <div class="container">
+        <div class="footer-inner">
+          <a href="#home" class="nav-logo" style="display:flex;align-items:center;gap:10px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" style="width:32px;height:32px;flex-shrink:0">
+              <defs>
+                <linearGradient id="dg-footer" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#4FC3F7" />
+                  <stop offset="100%" stop-color="#0D47A1" />
+                </linearGradient>
+              </defs>
+              <path fill="url(#dg-footer)"
+                d="M18,12 L36,12 L36,19 L43,19 L43,12 Q87,12 87,50 Q87,88 43,88 L43,81 L36,81 L36,88 L18,88 L18,64 L28,64 L28,50 L18,50 Z" />
+              <path fill="white" d="M43,19 Q80,19 80,50 Q80,81 43,81 Z" />
+              <circle cx="61" cy="50" r="21" fill="url(#dg-footer)" />
+              <circle cx="61" cy="50" r="15" fill="white" />
+              <path fill="url(#dg-footer)" d="M68,43 A10,10,0,1,0,71,50 L61,50 L61,43 Z" />
+              <circle cx="61" cy="50" r="5" fill="white" />
+            </svg>
+            <div>
+              <span class="logo-main">DGMODIFY</span>
+              <span class="logo-sub" style="display:block">Visual Creative</span>
+            </div>
+          </a>
+          <p class="footer-copy">© 2025 DGMODIFY. All Rights Reserved.</p>
+          <div class="footer-socials">
+            <a href="#" class="social-link" aria-label="Instagram" id="footer-instagram"><svg viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+              </svg></a>
+            <a href="#" class="social-link" aria-label="Behance" id="footer-behance"><svg viewBox="0 0 24 24"
+                fill="currentColor">
+                <path
+                  d="M9 12c0 1.105-.895 2-2 2s-2-.895-2-2 .895-2 2-2 2 .895 2 2zm6.5-2h-4v1h4v-1zm-6.5 6H5v-1.5h4V16c0 .552-.448 1-1 1zm7.5-.5c0 .276-.224.5-.5.5H14v-1h2v.5z" />
+              </svg></a>
+            <a href="#" class="social-link" aria-label="YouTube" id="footer-youtube"><svg viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.8">
+                <path
+                  d="M22.54 6.42a2.78 2.78 0 0 0-1.94-1.96C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 1.96A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1C5.12 19.56 12 19.56 12 19.56s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-1.95 29 29 0 0 0 .46-5.34 29 29 0 0 0-.46-5.33z" />
+                <polygon points="9.75,15.02 15.5,11.75 9.75,8.48 9.75,15.02" />
+              </svg></a>
+            <button class="back-to-top" id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M18 15l-6-6-6 6" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </div><!-- /site-wrapper -->
+
+  <!-- ── Scripts ────────────────────────────────────────────────── -->
+  <script>
+    /* ════════════════════════════════════════════════
+       SCROLL ANIMATION — Frame Player
+    ════════════════════════════════════════════════ */
+    const canvas = document.getElementById('hero-canvas');
+    const ctx = canvas.getContext('2d');
+    const TOTAL = 240;
+    const FOLDER = './ezgif-2cdd25856151c96f-png-split/';
+
+    const frames = new Array(TOTAL);
+    let loaded = 0;
+
+    function pad(n) { return String(n).padStart(3, '0'); }
+
+    function preload() {
+      const bar = document.getElementById('loading-bar');
+      return new Promise(resolve => {
+        for (let i = 0; i < TOTAL; i++) {
+          const img = new Image();
+          img.src = `${FOLDER}ezgif-frame-${pad(i + 1)}.png`;
+          img.onload = img.onerror = () => {
+            loaded++;
+            bar.style.width = (loaded / TOTAL * 100) + '%';
+            if (loaded === TOTAL) resolve();
+          };
+          frames[i] = img;
+        }
+      });
+    }
+
+    function fitCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function drawFrame(index) {
+      const img = frames[index];
+      if (!img || !img.complete) return;
+      const cw = canvas.width, ch = canvas.height;
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      const scale = Math.max(cw / iw, ch / ih);
+      const sw = iw * scale, sh = ih * scale;
+      const ox = (cw - sw) / 2, oy = (ch - sh) / 2;
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.drawImage(img, ox, oy, sw, sh);
+    }
+
+    let currentFrame = 0;
+    let targetFrame = 0;
+    const LERP = 0.1;
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    function animate() {
+      currentFrame = lerp(currentFrame, targetFrame, LERP);
+      const idx = Math.min(Math.max(Math.round(currentFrame), 0), TOTAL - 1);
+      drawFrame(idx);
+      requestAnimationFrame(animate);
+    }
+
+    function onScroll() {
+      const scrollTop = window.scrollY;
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      const progress = maxScroll > 0 ? Math.min(scrollTop / maxScroll, 1) : 0;
+      targetFrame = Math.floor(progress * (TOTAL - 1));
+    }
+
+    preload().then(() => {
+      fitCanvas();
+      drawFrame(0);
+
+      // Hide loading screen
+      const ls = document.getElementById('loading-screen');
+      ls.classList.add('hide');
+      setTimeout(() => ls.style.display = 'none', 700);
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', () => { fitCanvas(); drawFrame(Math.round(currentFrame)); });
+      animate();
+    });
+
+    /* ════════════════════════════════════════════════
+       BEFORE / AFTER SLIDER
+    ════════════════════════════════════════════════ */
+    const baWrap = document.getElementById('before-after-wrap');
+    const baAfter = document.getElementById('ba-after');
+    const baDivider = document.getElementById('ba-divider');
+    let isDragging = false;
+
+    function setSlider(pct) {
+      const p = Math.min(Math.max(pct, 0), 100);
+      baAfter.style.clipPath = `inset(0 ${100 - p}% 0 0)`;
+      baDivider.style.left = p + '%';
+    }
+
+    setSlider(50);
+
+    function getPercent(e) {
+      const rect = baWrap.getBoundingClientRect();
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      return (x / rect.width) * 100;
+    }
+
+    baDivider.addEventListener('mousedown', () => { isDragging = true; });
+    window.addEventListener('mousemove', e => { if (isDragging) setSlider(getPercent(e)); });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+    baDivider.addEventListener('touchstart', e => { isDragging = true; e.preventDefault(); }, { passive: false });
+    window.addEventListener('touchmove', e => { if (isDragging) setSlider(getPercent(e)); }, { passive: true });
+    window.addEventListener('touchend', () => { isDragging = false; });
+
+    /* ════════════════════════════════════════════════
+       PROJECT FILTER TABS
+    ════════════════════════════════════════════════ */
+    function filterProjects(type) {
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + type).classList.add('active');
+      document.querySelectorAll('.project-card').forEach(card => {
+        if (type === 'all' || card.dataset.type === type) {
+          card.style.display = '';
+          card.style.opacity = '1';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    /* ════════════════════════════════════════════════
+       ADVANCED SCROLL-REVEAL SYSTEM
+    ════════════════════════════════════════════════ */
+
+    (function initScrollAnimations() {
+
+      /* ── 1. Auto-tag elements with animation variants ── */
+      const tag = (sel, anim, delay) => {
+        document.querySelectorAll(sel).forEach((el, i) => {
+          if (!el.dataset.anim) el.dataset.anim = anim;
+          if (delay) el.style.transitionDelay = (i * delay) + 's';
+        });
+      };
+
+      /* Section headings — blur wipe in */
+      tag('.section-tag', 'fade-right');
+      tag('.section-heading', 'fade-blur');
+
+      /* Hero elements — cascade from top */
+      tag('.hero-tag', 'fade-up');
+      tag('.hero-name', 'fade-up');
+      tag('.hero-roles', 'fade-up');
+      tag('.hero-desc', 'fade-up');
+      tag('.hero-cta', 'fade-up');
+      tag('.hero-socials', 'fade-up');
+      tag('.scroll-indicator', 'fade-up');
+
+      /* Services left column */
+      tag('.services-heading', 'fade-right');
+      tag('.services-link', 'fade-right');
+
+      /* Services cards — stagger grid */
+      const sGrid = document.querySelector('.services-grid');
+      if (sGrid) sGrid.dataset.animStagger = '';
+
+      /* Project cards — stagger */
+      const pGrid = document.querySelector('.projects-grid');
+      if (pGrid) pGrid.dataset.animStagger = '';
+
+      /* Photo section */
+      tag('.before-after', 'scale-up');
+      tag('.photo-right', 'fade-left');
+
+      /* Graphic cards — stagger */
+      const gGrid = document.querySelector('.graphic-grid');
+      if (gGrid) gGrid.dataset.animStagger = '';
+
+      /* Video cards — stagger */
+      const vGrid = document.querySelector('.video-grid');
+      if (vGrid) vGrid.dataset.animStagger = '';
+
+      /* Tools bar */
+      tag('.tools-label', 'fade-right');
+      tag('.tool-item', 'fade-up', 0.07);
+
+      /* About section */
+      tag('.about-photo-wrap', 'scale-up');
+      tag('.about-text-col', 'fade-right');
+      tag('.cta-col', 'fade-left');
+
+      /* Footer */
+      tag('.footer-inner', 'fade-up');
+
+      /* ── 2. Work-header, video-header */
+      tag('.work-header', 'fade-up');
+      tag('.video-header', 'fade-up');
+      tag('.photo-layout > *:first-child', 'fade-right');
+      tag('.view-all-wrap', 'fade-up');
+
+      /* ── 3. Stagger: add transition-delay per child ── */
+      document.querySelectorAll('[data-anim-stagger]').forEach(grid => {
+        Array.from(grid.children).forEach((child, i) => {
+          child.style.transitionDelay = (i * 0.07) + 's';
+        });
+      });
+
+      /* ── 4. IntersectionObserver ── */
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          el.classList.add('anim-visible');
+          // Also handle legacy .fade-up class
+          if (el.classList.contains('fade-up')) el.classList.add('visible');
+          io.unobserve(el);
+        });
+      }, {
+        threshold: 0.08,
+        rootMargin: '0px 0px -40px 0px'
+      });
+
+      /* Observe all tagged elements */
+      document.querySelectorAll('[data-anim], [data-anim-stagger]').forEach(el => io.observe(el));
+      /* Also observe legacy .fade-up elements */
+      document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+
+    })();
+
+    /* ════════════════════════════════════════════════
+       ACTIVE NAV LINK
+    ════════════════════════════════════════════════ */
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+
+    const navObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          navLinks.forEach(a => a.classList.remove('active'));
+          const link = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+          if (link) link.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+
+    sections.forEach(s => navObserver.observe(s));
+
+    /* ════════════════════════════════════════════════
+       PHOTOSHOP TEXT TOOL ANIMATION
+    ════════════════════════════════════════════════ */
+    (function initPSTextAnim() {
+      const box = document.getElementById('ps-box');
+      const typed = document.getElementById('ps-typed');
+      const cursor = document.getElementById('ps-cursor');
+      if (!box || !typed || !cursor) return;
+
+      const FULL_TEXT = 'Dammika\nGunarathna';
+      const CHAR_DELAY = 68;   // ms per character
+      const BOX_HOLD = 520;  // ms box stays before typing starts
+      const DONE_HOLD = 900;  // ms cursor stays after typing finishes
+
+      // Phase 1: wait for loading screen, then draw the selection box
+      setTimeout(() => {
+        box.classList.add('ps-box--drawing');
+
+        // Phase 2: after box draws, start typing
+        setTimeout(() => {
+          cursor.classList.add('ps-cursor--active');
+          let i = 0;
+
+          function typeNext() {
+            if (i < FULL_TEXT.length) {
+              const ch = FULL_TEXT[i];
+              if (ch === '\n') {
+                typed.appendChild(document.createElement('br'));
+              } else {
+                typed.insertAdjacentText('beforeend', ch);
+              }
+              i++;
+              const jitter = CHAR_DELAY + (Math.random() * 40 - 20);
+              setTimeout(typeNext, jitter);
+            } else {
+              // Phase 3: typing done — fade the selection box away
+              setTimeout(() => {
+                box.classList.remove('ps-box--drawing');
+                box.classList.add('ps-box--done');
+                setTimeout(() => {
+                  box.style.transition = 'opacity 0.6s ease, border-color 0.4s';
+                  box.style.opacity = '0';
+                  setTimeout(() => {
+                    cursor.classList.remove('ps-cursor--active');
+                    cursor.style.display = 'none';
+                  }, 1200);
+                }, DONE_HOLD);
+              }, 300);
+            }
+          }
+          typeNext();
+        }, BOX_HOLD);
+
+      }, 1400); // delay so loading screen clears first
+    })();
+
+    /* ════════════════════════════════════════════════
+       DYNAMIC YOUTUBE INTEGRATION (@dgmodify)
+    ════════════════════════════════════════════════ */
+    const INITIAL_VIDEOS = [
+      {
+        id: 'A761BCYht5g',
+        title: '“She Crossed the Screen… And Shook My Hand 😍”',
+        type: 'AI VFX & Edit',
+        badge: 'SHORTS',
+        thumbnail: 'https://i.ytimg.com/vi/A761BCYht5g/hqdefault.jpg',
+        link: 'https://www.youtube.com/shorts/A761BCYht5g'
+      },
+      {
+        id: 'N0LdAvtjFnM',
+        title: 'Assassin\'s Creed Characters taking Selfies on Set! 📸',
+        type: 'AI Art & Edit',
+        badge: 'SHORTS',
+        thumbnail: 'https://i.ytimg.com/vi/N0LdAvtjFnM/hqdefault.jpg',
+        link: 'https://www.youtube.com/shorts/N0LdAvtjFnM'
+      },
+      {
+        id: 'e5whnxpLmEs',
+        title: 'Special Poster Design for Raveen Tharuka',
+        type: 'Poster Design',
+        badge: 'SHORTS',
+        thumbnail: 'https://i.ytimg.com/vi/e5whnxpLmEs/hqdefault.jpg',
+        link: 'https://www.youtube.com/shorts/e5whnxpLmEs'
+      },
+      {
+        id: 'gXKxIo_T-Tc',
+        title: 'Sri Lankan Wedding Album Design 😍❤️🇱🇰',
+        type: 'Album Design',
+        badge: 'PHOTO EDIT',
+        thumbnail: 'https://i.ytimg.com/vi/gXKxIo_T-Tc/hqdefault.jpg',
+        link: 'https://www.youtube.com/shorts/gXKxIo_T-Tc'
+      },
+      {
+        id: 'QgEvXAw5vdk',
+        title: 'Mathaka Soya Music Poster Design',
+        type: 'Music Poster',
+        badge: 'GRAPHIC',
+        thumbnail: 'https://i.ytimg.com/vi/QgEvXAw5vdk/hqdefault.jpg',
+        link: 'https://www.youtube.com/shorts/QgEvXAw5vdk'
+      },
+      {
+        id: 'e3U4p1N8OHM',
+        title: 'How to Create Simple Calculator using HTML, CSS, JavaScript',
+        type: 'Web Development',
+        badge: 'TUTORIAL',
+        thumbnail: 'https://i.ytimg.com/vi/e3U4p1N8OHM/hqdefault.jpg',
+        link: 'https://www.youtube.com/watch?v=e3U4p1N8OHM'
+      },
+      {
+        id: 'ZnrSXMBcp8I',
+        title: 'Oil Painting Effect (Without Plugins) - Chris Hemsworth',
+        type: 'Photoshop Tutorial',
+        badge: 'TUTORIAL',
+        thumbnail: 'https://i.ytimg.com/vi/ZnrSXMBcp8I/hqdefault.jpg',
+        link: 'https://www.youtube.com/watch?v=ZnrSXMBcp8I'
+      },
+      {
+        id: '9WpTVLJtN6I',
+        title: 'Dramatic Black & White Effect in Photoshop',
+        type: 'Color Grading',
+        badge: 'TUTORIAL',
+        thumbnail: 'https://i.ytimg.com/vi/9WpTVLJtN6I/hqdefault.jpg',
+        link: 'https://www.youtube.com/watch?v=9WpTVLJtN6I'
+      },
+      {
+        id: '42UV3srEC2s',
+        title: 'Pixel Sorting Effect in Photoshop',
+        type: 'Photoshop VFX',
+        badge: 'SHORTS',
+        thumbnail: 'https://i.ytimg.com/vi/42UV3srEC2s/hqdefault.jpg',
+        link: 'https://www.youtube.com/shorts/42UV3srEC2s'
+      },
+      {
+        id: 'bjMs4Ql7M2A',
+        title: 'How to Create a Silhouette Poster in Photoshop (in 2 min)',
+        type: 'Photoshop Tutorial',
+        badge: 'TUTORIAL',
+        thumbnail: 'https://i.ytimg.com/vi/bjMs4Ql7M2A/hqdefault.jpg',
+        link: 'https://www.youtube.com/watch?v=bjMs4Ql7M2A'
+      }
+    ];
+
+    let currentVideosList = INITIAL_VIDEOS;
+    let showAllVideos = false;
+
+    function categorizeVideo(title, isShort) {
+      const t = (title || '').toLowerCase();
+      if (t.includes('photoshop') || t.includes('tutorial')) return 'Photoshop Tutorial';
+      if (t.includes('poster')) return 'Poster Design';
+      if (t.includes('album')) return 'Album Design';
+      if (t.includes('calculator') || t.includes('html') || t.includes('javascript')) return 'Web Development';
+      if (t.includes('oil painting') || t.includes('manipulation')) return 'Photo Manipulation';
+      if (t.includes('black & white') || t.includes('color grading')) return 'Color Grading';
+      if (t.includes('ai') || t.includes('handshake')) return 'AI VFX & Edit';
+      if (isShort) return 'Short Edit';
+      return 'Video & Motion';
+    }
+
+    function escapeHtml(str) {
+      return (str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function renderVideos(videos) {
+      if (!Array.isArray(videos) || videos.length === 0) return;
+      currentVideosList = videos;
+      const grid = document.getElementById('video-grid');
+      if (!grid) return;
+
+      grid.innerHTML = videos.map((v, i) => {
+        const isExtra = i >= 5;
+        const cleanTitle = escapeHtml(v.title);
+        const safeId = escapeHtml(v.id);
+        const safeLink = escapeHtml(v.link || `https://www.youtube.com/watch?v=${v.id}`);
+        const safeThumb = escapeHtml(v.thumbnail || `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`);
+        const safeType = escapeHtml(v.type || 'Video');
+        const safeBadge = escapeHtml(v.badge || 'VIDEO');
+
+        return `
+        <div class="video-card ${isExtra ? 'video-card--extra' : ''}" data-video-id="${safeId}" onclick="openYtModal('${safeId}', '${cleanTitle.replace(/'/g, "\\'")}', '${safeLink}')" style="transition-delay:${(i % 5) * 0.06}s">
+          <div class="video-thumb">
+            <img src="${safeThumb}" alt="${cleanTitle}" class="video-thumb-img" loading="lazy" onerror="this.src='https://i.ytimg.com/vi/${safeId}/hqdefault.jpg'">
+            <div class="video-thumb-overlay"></div>
+            <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21 5,3"/></svg></div>
+            <span class="video-badge">${safeBadge}</span>
+            <div class="yt-thumb-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></div>
+          </div>
+          <div class="video-info">
+            <div class="video-type">${safeType}</div>
+            <div class="video-title" title="${cleanTitle}">${cleanTitle}</div>
+            <div class="video-meta">
+              <span>DGMODIFY</span>
+              <span class="video-watch-link">Watch Video →</span>
+            </div>
+          </div>
+        </div>
+      `;
+      }).join('');
+
+      const toggleText = document.getElementById('toggle-more-text');
+      if (toggleText && !showAllVideos) {
+        toggleText.textContent = `Show More Videos (${videos.length})`;
+      }
+    }
+
+    function toggleMoreVideos() {
+      showAllVideos = !showAllVideos;
+      const grid = document.getElementById('video-grid');
+      const text = document.getElementById('toggle-more-text');
+      const icon = document.getElementById('toggle-more-icon');
+      if (!grid) return;
+
+      if (showAllVideos) {
+        grid.classList.add('show-all');
+        if (text) text.textContent = 'Show Less';
+        if (icon) icon.style.transform = 'rotate(180deg)';
+      } else {
+        grid.classList.remove('show-all');
+        if (text) text.textContent = `Show More Videos (${currentVideosList.length})`;
+        if (icon) icon.style.transform = 'rotate(0deg)';
+        const sec = document.getElementById('video-motion');
+        if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function openYtModal(videoId, title, link) {
+      const modal = document.getElementById('yt-modal');
+      const iframe = document.getElementById('yt-modal-iframe');
+      const titleEl = document.getElementById('yt-modal-title');
+      const btnEl = document.getElementById('yt-modal-yt-btn');
+      if (!modal || !iframe) return;
+
+      if (titleEl) titleEl.textContent = title || 'DGMODIFY Video';
+      if (btnEl) btnEl.href = link || `https://www.youtube.com/watch?v=${videoId}`;
+      iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`;
+      modal.classList.add('active');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeYtModal() {
+      const modal = document.getElementById('yt-modal');
+      const iframe = document.getElementById('yt-modal-iframe');
+      if (!modal) return;
+
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden', 'true');
+      if (iframe) iframe.src = '';
+      document.body.style.overflow = '';
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeYtModal();
+    });
+
+    // Dynamic live YouTube channel fetch
+    async function fetchLiveYouTubeChannelVideos() {
+      const CHANNEL_ID = 'UC5Z0N8sH_WNfxCjDDcJLgSg';
+      const RSS_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
+      const API_URL = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(RSS_URL)}`;
+
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (data.status === 'ok' && Array.isArray(data.items) && data.items.length > 0) {
+          const liveVideos = data.items.map(item => {
+            let id = '';
+            if (item.guid && item.guid.includes('yt:video:')) {
+              id = item.guid.replace('yt:video:', '');
+            } else if (item.link) {
+              const m = item.link.match(/(?:v=|shorts\/|youtu\.be\/)([\w-]{11})/);
+              id = m ? m[1] : '';
+            }
+            const rawTitle = item.title || '';
+            const cleanTitle = rawTitle.replace(/#\w+/g, '').replace(/\s+/g, ' ').trim();
+            const isShort = (item.link && item.link.includes('/shorts/')) || rawTitle.toLowerCase().includes('#shorts');
+            return {
+              id: id || item.guid,
+              title: cleanTitle || rawTitle,
+              link: item.link || `https://www.youtube.com/watch?v=${id}`,
+              thumbnail: item.thumbnail || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+              type: categorizeVideo(cleanTitle, isShort),
+              badge: isShort ? 'SHORTS' : 'TUTORIAL'
+            };
+          }).filter(v => Boolean(v.id));
+
+          if (liveVideos.length > 0) {
+            try { localStorage.setItem('dgmodify_yt_cache', JSON.stringify(liveVideos)); } catch (e) { }
+            renderVideos(liveVideos);
+            const liveBadge = document.getElementById('yt-live-status');
+            if (liveBadge) {
+              const textSpan = liveBadge.querySelector('span:last-child');
+              if (textSpan) textSpan.innerHTML = 'Live YouTube Feed: <strong>@dgmodify</strong> &bull; Synced';
+            }
+          }
+        }
+      } catch (err) {
+        console.log('Using local fallback videos for DGMODIFY YouTube:', err);
+      }
+    }
+
+    // Check cache or initialize
+    (function initYouTubeFeed() {
+      try {
+        const cached = localStorage.getItem('dgmodify_yt_cache');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            renderVideos(parsed);
+          }
+        }
+      } catch (e) { }
+      // Fetch live in background
+      setTimeout(fetchLiveYouTubeChannelVideos, 1500);
+    })();
+
+  </script>
+
+  <!-- ── YouTube Video Player Modal ────────────────────────────── -->
+  <div id="yt-modal" class="yt-modal" aria-hidden="true" role="dialog">
+    <div class="yt-modal-backdrop" onclick="closeYtModal()"></div>
+    <div class="yt-modal-content">
+      <div class="yt-modal-header">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="color:#ff0000;flex-shrink:0">
+            <path
+              d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+          </svg>
+          <span id="yt-modal-title" class="yt-modal-title">DGMODIFY Video</span>
+        </div>
+        <button class="yt-modal-close" onclick="closeYtModal()" aria-label="Close modal">✕</button>
+      </div>
+      <div class="yt-modal-iframe-wrap">
+        <iframe id="yt-modal-iframe" src=""
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+      <div class="yt-modal-footer">
+        <div style="font-size:12px;color:var(--muted)">DGMODIFY &mdash; Visual Creative</div>
+        <a id="yt-modal-yt-btn" href="https://www.youtube.com/@dgmodify" target="_blank" rel="noopener"
+          class="view-all-link" style="font-size:12px">
+          Watch on YouTube
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
